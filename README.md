@@ -1,16 +1,13 @@
-# curd_practice
+## Todo App
+A Todo App Created Using GetX with API integration
 
-A new Flutter project.
+### Feature
+1.  Built a cross-platform Todo App using Flutter with CRUD functionality.  
+2.  Developed the backend with Spring Boot, integrating RESTful APIs for smooth data handling.  
+3.  Integrated GetX for state management, boosting performance and user experience.  
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### UI
+![1](https://github.com/user-attachments/assets/747414f6-588a-4d5f-a415-7b486d1d9e5a)
+![2](https://github.com/user-attachments/assets/29bd9cab-505b-48aa-9aca-fb7ac1c69cef)
+![3](https://github.com/user-attachments/assets/dc3a3fa1-40e6-489b-b53b-65806770d314)
+![4](https://github.com/user-attachments/assets/001b425c-8903-4210-9de5-b99e8b07451b)
