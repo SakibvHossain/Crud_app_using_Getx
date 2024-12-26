@@ -1,34 +1,16 @@
 import 'package:curd_practice/feature/data/controller/crud_controller.dart';
+import 'package:curd_practice/feature/data/model/item.dart';
 import 'package:curd_practice/feature/ui/widgets/item_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class HomeScreens extends StatefulWidget {
-  final CrudController controller = Get.put(CrudController());
+class HomeScreens extends StatelessWidget {
   HomeScreens({super.key});
 
-  @override
-  _HomeScreensState createState() => _HomeScreensState();
-}
+  CrudController controller = Get.put(CrudController());
 
-class _HomeScreensState extends State<HomeScreens> {
-
-  @override
- initState() {
-    super.initState();
-    setState(() {
-      widget.controller.allTodos.clear();
-    });
-
-    fetchData();
-
-  }
-
-  Future<void> fetchData() async{
-    await widget.controller.getTodos();  // Call the function once the widget is initialized
-    print('Nothing found');
-    print(widget.controller.allTodos.length);
-  }
+  TextEditingController titleController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +18,7 @@ class _HomeScreensState extends State<HomeScreens> {
       appBar: AppBar(
         centerTitle: true,
         title: const Text(
-          'CRUD APP',
+          'Todo APP',
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.blue,
@@ -50,12 +32,20 @@ class _HomeScreensState extends State<HomeScreens> {
         child: Column(
           children: [
             Expanded(
-              child: ListView.builder(
-                itemCount: 8,
-                itemBuilder: (context, index) {
-                  return ItemCard();
-                },
-              ),
+              child: Obx((){
+                if(controller.isLoading.value){
+                  return const Center(child: CircularProgressIndicator());
+                }else{
+                  return ListView.builder(
+                    itemCount: controller.allTodos.length,
+                    itemBuilder: (context, index) {
+                      // Dynamically pass data from the list of todos
+                      Data data = controller.allTodos[index];
+                      return ItemCard(id: data.id!, title: data.title!, description: data.description!, indexNumber: index,);
+                    },
+                  );
+                }
+              }),
             ),
           ],
         ),
@@ -83,6 +73,7 @@ class _HomeScreensState extends State<HomeScreens> {
               ),
               const SizedBox(height: 8.0),
               TextFormField(
+                controller: titleController,
                 autofocus: true,
                 decoration: const InputDecoration(
                   labelText: 'Title',
@@ -91,6 +82,7 @@ class _HomeScreensState extends State<HomeScreens> {
               ),
               const SizedBox(height: 8.0),
               TextFormField(
+                controller: descriptionController,
                 decoration: const InputDecoration(
                   labelText: 'Description',
                   border: OutlineInputBorder(),
@@ -110,25 +102,48 @@ class _HomeScreensState extends State<HomeScreens> {
                         ),
                       ),
                       const SizedBox(width: 4.0),
-                      Switch(
-                        value: false,
-                        onChanged: (value) {
-                          //todo: Implement pending or complete operation
-                        },
-                        activeColor: Colors.blue,
-                        inactiveThumbColor: Colors.grey,
-                        activeTrackColor: Colors.lightBlue,
-                        inactiveTrackColor: Colors.grey[300],
-                      ),
+                      Obx((){
+                        return Switch(
+                          value: controller.isCompleted.value,
+                          onChanged: (value) {
+                            controller.isCompleted.value = value; // Update the value of isCompleted when the switch is toggled
+                          },
+                          activeColor: Colors.blue,
+                          inactiveThumbColor: Colors.grey,
+                          activeTrackColor: Colors.lightBlue,
+                          inactiveTrackColor: Colors.grey[300],
+                        );
+                      }),
                     ],
                   ),
-                  ElevatedButton(onPressed: () {}, child: const Text('Save'))
+                  ElevatedButton(
+                    onPressed: () {
+                      // Creating the map for the new todo
+                      Map<String, dynamic> todos = {
+                        'title': titleController.text,
+                        'description': descriptionController.text,
+                        'isCompleted': controller.isCompleted.value, // Pass the updated isCompleted value
+                      };
+
+                      controller.createTodos(todos); // Call the controller to create the todo
+
+                      // Clear the form fields
+                      titleController.clear();
+                      descriptionController.clear();
+                      controller.isCompleted.value = false; // Reset isCompleted to false
+
+                      // Close the bottom sheet
+                      Get.back();
+                    },
+                    child: const Text('Save'),
+                  ),
                 ],
-              )
+              ),
             ],
           ),
         ),
       ),
     );
   }
+
 }

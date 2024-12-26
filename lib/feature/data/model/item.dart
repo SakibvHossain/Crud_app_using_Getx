@@ -1,55 +1,50 @@
 class Item {
-  final String status;
-  final List<Task> data;
+  String? status;
+  List<Data>? data;
 
-  Item({
-    required this.status,
-    required this.data,
-  });
+  Item({this.status, this.data});
 
-  factory Item.fromJson(Map<String, dynamic> json) {
-    return Item(
-      status: json['status'],
-      data: List<Task>.from(json['data'].map((x) => Task.fromJson(x))),
-    );
+  Item.fromJson(Map<String, dynamic> json) {
+    status = json['status'];
+    if (json['data'] != null) {
+      data = <Data>[];
+      json['data'].forEach((v) {
+        data!.add(new Data.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'status': status,
-      'data': List<dynamic>.from(data.map((x) => x.toJson())),
-    };
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['status'] = this.status;
+    if (this.data != null) {
+      data['data'] = this.data!.map((v) => v.toJson()).toList();
+    }
+    return data;
   }
 }
 
-class Task {
-  final int id;
-  final String title;
-  final String description;
-  final bool isCompleted;
+class Data {
+  int? id;
+  String? title;
+  String? description;
+  bool? isCompleted;
 
-  Task({
-    required this.id,
-    required this.title,
-    required this.description,
-    required this.isCompleted,
-  });
+  Data({this.id, this.title, this.description, this.isCompleted});
 
-  factory Task.fromJson(Map<String, dynamic> json) {
-    return Task(
-      id: json['id'],
-      title: json['title'],
-      description: json['description'],
-      isCompleted: json['isCompleted'],
-    );
+  Data.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    title = json['title'];
+    description = json['description'];
+    isCompleted = json['isCompleted'];
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'title': title,
-      'description': description,
-      'isCompleted': isCompleted,
-    };
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['title'] = this.title;
+    data['description'] = this.description;
+    data['isCompleted'] = this.isCompleted;
+    return data;
   }
 }

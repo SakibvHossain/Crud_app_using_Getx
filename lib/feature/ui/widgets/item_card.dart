@@ -1,9 +1,17 @@
+import 'package:curd_practice/feature/data/controller/crud_controller.dart';
+import 'package:curd_practice/feature/data/model/item.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class ItemCard extends StatelessWidget {
+  ItemCard({super.key, required this.title, required this.description, required this.indexNumber, required this.id});
 
+  final String title;
+  final String description;
+  final int indexNumber;
+  final int id;
 
-  const ItemCard({super.key});
+  CrudController controller = Get.put(CrudController());
 
 
   @override
@@ -29,17 +37,18 @@ class ItemCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(10), // Constrain ripple to rounded corners
           onTap: () {
             print('Bob tapped');
+            curdUpdateBottomSheet(todo: controller.allTodos[indexNumber]);
           },
           child: ListTile(
             // Splash effect
             splashColor: Colors.blue.withOpacity(0.2),
 
             // Leading avatar icon
-            leading: const CircleAvatar(
+            leading: CircleAvatar(
               backgroundColor: Colors.green,
               radius: 20, // Ensures consistent size
               child: Text(
-                'A',
+                (indexNumber+1).toString(),
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -49,18 +58,19 @@ class ItemCard extends StatelessWidget {
             ),
 
             // Title
-            title: const Text(
-              'Argus',
-              style: TextStyle(
+            title: Text(
+              title,
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
               ),
             ),
 
             // Subtitle
-            subtitle: const Text(
-              'You still working...',
-              style: TextStyle(
+            subtitle: Text(
+              description,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
                 color: Colors.grey,
               ),
             ),
@@ -68,7 +78,8 @@ class ItemCard extends StatelessWidget {
             // Trailing delete button
             trailing: IconButton(
               onPressed: () {
-                print('Delete button tapped');
+                controller.delete(id);
+                print('Delete button tapped on index $id');
               },
               icon: const Icon(
                 Icons.delete,
@@ -76,6 +87,104 @@ class ItemCard extends StatelessWidget {
               ),
               tooltip: 'Delete',
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void curdUpdateBottomSheet({required todo}) {
+    Data data = todo;
+
+    // Controllers for TextFields
+    TextEditingController titleController = TextEditingController(text: data.title);
+    TextEditingController descriptionController = TextEditingController(text: data.description);
+
+    Get.bottomSheet(
+      Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              const Text(
+                'Update Todo',
+                style: TextStyle(fontSize: 24, color: Colors.black),
+              ),
+              const SizedBox(height: 8.0),
+              TextFormField(
+                controller: titleController,
+                autofocus: true,
+                decoration: const InputDecoration(
+                  labelText: 'Title',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 8.0),
+              TextFormField(
+                controller: descriptionController,
+                decoration: const InputDecoration(
+                  labelText: 'Description',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 8.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      const Text(
+                        'Is todo completed?',
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(width: 4.0),
+                      Obx((){
+                        return Switch(
+                          value: controller.isCompleted.value,
+                          onChanged: (value) {
+                            controller.isCompleted.value = value; // Update the value of isCompleted when the switch is toggled
+                          },
+                          activeColor: Colors.blue,
+                          inactiveThumbColor: Colors.grey,
+                          activeTrackColor: Colors.lightBlue,
+                          inactiveTrackColor: Colors.grey[300],
+                        );
+                      }),
+                    ],
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Creating the map for the new todo
+                      Map<String, dynamic> todos = {
+                        'title': titleController.text,
+                        'description': descriptionController.text,
+                        'isCompleted': controller.isCompleted.value, // Pass the updated isCompleted value
+                      };
+
+                      controller.updateTodos(todos, data.id!); // Call the controller to create the todo
+
+                      // Clear the form fields
+                      titleController.clear();
+                      descriptionController.clear();
+
+                      // Close the bottom sheet
+                      Get.back();
+                    },
+                    child: const Text('Save'),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),
